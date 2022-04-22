@@ -19,10 +19,10 @@ class SearchUsersTableViewCell: UITableViewCell {
     var disposeBag = DisposeBag()
     
     //  Called when cells are reused
-//    override func prepareForReuse() {
-//        super.prepareForReuse()
-//        disposeBag = DisposeBag()
-//    }
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag()
+    }
     
     func bindCell(_ userData: Any, cellType: SelectTabType)  {
         if cellType == .API {

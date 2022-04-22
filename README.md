@@ -24,7 +24,7 @@ Github Search User API을 사용 (https://docs.github.com/en/rest/reference/sear
  ex) w를 검색하면 login 값에 w가 없어도 검색 결과에 나옴.
 - 페이지 처리에 대한 동작 추가 필요. 불필요한 API 호출을 막기 위한 방법 필요.
 - Realm 이용한 Tableview Data mapping 의 delete 동작 시 문제가 있음. tableview data 연결 방법을 생각해봐야 겠음
-- cell 의 favotire button 동작이 예상과 다름... rx의 문제인지??
+- cell 의 favotire button 동작이 예상과 다름... rx의 문제인지?? (수정)
 
 # 사용한 framwork
 
