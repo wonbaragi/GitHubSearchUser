@@ -104,10 +104,10 @@ class SearchUsersViewModel: NSObject {
     }
     
     func deleteLocalUserFavorite(_ userID: Int64, completion: @escaping () -> Void ) {
-        try! localFavoriteRealm.write {
-            if let favoriteUesr = localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: userID) {
-                print("favoriteUesr delete \(favoriteUesr.userName)")
-                if localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId) != nil {
+        if let favoriteUesr = localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: userID) {
+            print("favoriteUesr delete \(favoriteUesr.userName)")
+            if localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId) != nil {
+                try! localFavoriteRealm.write {
                     localFavoriteRealm.delete(localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId)!)
                     getLocalUsers()
                     completion()

@@ -79,15 +79,16 @@ class FavoriteUserTableViewDataSource: NSObject, UITableViewDataSource {
         }
         let section = filteredSections[indexPath.section]
         let favoriteUser = section.value[indexPath.row]
+        
         cell.bindCell(favoriteUser, cellType: .LOCAL)
         
-        cell.btnSetFavorite.rx.tap.bind { [weak self] in
+        cell.rx.tapButton.subscribe(onNext: { [weak self] in
             if let viewmodel = self?.viewModel {
                 viewmodel.deleteLocalUserFavorite(favoriteUser.userId, completion: {
                     self?.showFavoriteUserList()
                 })
             }
-        }.disposed(by: cell.disposeBag)
+        }).disposed(by: cell.disposeBag)
         
         return cell
     }

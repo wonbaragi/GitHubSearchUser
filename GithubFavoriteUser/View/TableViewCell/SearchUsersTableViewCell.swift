@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import RxSwift
+import RxCocoa
 
 class SearchUsersTableViewCell: UITableViewCell {
     
@@ -36,6 +37,8 @@ class SearchUsersTableViewCell: UITableViewCell {
                 else {
                     btnSetFavorite.setImage(UIImage(named: "icDetailPick24.png"), for: .normal)
                 }
+                
+                btnSetFavorite.rx.tap .subscribe().disposed(by: disposeBag)
             }
         }
         else {
@@ -43,7 +46,17 @@ class SearchUsersTableViewCell: UITableViewCell {
                 CacheImage.sharedCacheImage.loadImageFromUrl(urlString: data.profileImg, imageView: ivUserThumb!)
                 lbUserName.text = data.userName
                 btnSetFavorite.setImage(UIImage(named: "icDetailPick24Select.png"), for: .normal)
+                
+                btnSetFavorite.rx.tap .subscribe().disposed(by: disposeBag)
+
             }
         }
     }
 }
+
+extension Reactive where Base: SearchUsersTableViewCell {
+    var tapButton: ControlEvent<Void> {
+        ControlEvent(events: base.btnSetFavorite.rx.tap)
+    }
+}
+

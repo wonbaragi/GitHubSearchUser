@@ -90,10 +90,10 @@ class SearchUserViewController: UIViewController {
                     
                     cell.bindCell(item, cellType: .API)
                     
-                    cell.btnSetFavorite.rx.tap.bind { [weak self] in
+                    cell.rx.tapButton.subscribe(onNext: { [weak self] in
                         self?.viewModel.updateLocalUsersFavorite(item)
                         self?.tvSearchResult.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
-                    }.disposed(by: cell.disposeBag)
+                    }).disposed(by: cell.disposeBag)
                 }
                 .disposed(by: self.disposeBag)
             
@@ -102,22 +102,21 @@ class SearchUserViewController: UIViewController {
             vApiTabLine.isHidden = true
             vLocalTabLine.isHidden = false
             
+            viewModel.getLocalUsers()
+            
             dataSource.viewModel = self.viewModel
             dataSource.dataDidUpdated = { [weak self] in
                 guard let self = self else { return }
                 self.tvSearchResult.reloadData()
             }
+            dataSource.showFavoriteUserList()
             
             self.tvSearchResult.dataSource = dataSource
-            
-            dataSource.showFavoriteUserList()
-            self.tvSearchResult.reloadData()
             
             viewModel.favoriteUsers.subscribe(onNext: {_ in
                 self.tvSearchResult.reloadData()
             }).disposed(by: self.disposeBag)
             
-            viewModel.getLocalUsers()
         }
         
         tfSearchUserKeyword.text = ""
