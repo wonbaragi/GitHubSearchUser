@@ -15,7 +15,7 @@ class FavoriteUserTableViewDataSource: NSObject, UITableViewDataSource {
     typealias UserSection = (key: String, value: [LocalSerchUserInfo])
     private let localFavoriteRealm = try! Realm()
     
-    public var viewModel = SearchUsersViewModel(GithubFavoriteUserService())
+    public var viewModel: SearchUsersViewModel?
     private let disposeBag = DisposeBag()
     
     var searchText: String = "" {
@@ -47,6 +47,7 @@ class FavoriteUserTableViewDataSource: NSObject, UITableViewDataSource {
     
     func showFavoriteUserList() {
         var consonents = UnicodeUtil.UNICODE_DICTIONARY
+        favoriteUser.removeAll()
         
         favoriteUser = Array(localFavoriteRealm.objects(LocalSerchUserInfo.self)
             .sorted(byKeyPath: "userName", ascending: true))
@@ -60,7 +61,6 @@ class FavoriteUserTableViewDataSource: NSObject, UITableViewDataSource {
                 self.favoriteUserSections = consonents.sorted { $0.key < $1.key }
             })
             .disposed(by: disposeBag)
-            
     }
     
     // MARK: - UITableView DataSource
@@ -81,10 +81,13 @@ class FavoriteUserTableViewDataSource: NSObject, UITableViewDataSource {
         let favoriteUser = section.value[indexPath.row]
         cell.bindCell(favoriteUser, cellType: .LOCAL)
         
-        cell.btnSetFavorite.rx.tap.asDriver()
-            .drive(onNext: { [weak self] in
-                self?.viewModel.deleteLocalUserFavorite(indexPath.row)
-            }).disposed(by: cell.disposeBag)
+        cell.btnSetFavorite.rx.tap.bind { [weak self] in
+            if let viewmodel = self?.viewModel {
+                viewmodel.deleteLocalUserFavorite(favoriteUser.userId, completion: {
+                    self?.showFavoriteUserList()
+                })
+            }
+        }.disposed(by: cell.disposeBag)
         
         return cell
     }

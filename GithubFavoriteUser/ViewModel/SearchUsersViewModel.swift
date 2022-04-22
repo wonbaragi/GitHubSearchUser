@@ -71,35 +71,48 @@ class SearchUsersViewModel: NSObject {
             .sorted(byKeyPath: "userName", ascending: true)
         
         if getList.count > 0 {
+            for item in getList {
+                print("item \(item.userName)")
+            }
             favoriteUsers.accept(Array(getList))
         }
     }
     
-    func updateLocalUsersFavorite(_ index : Int) {
+    func updateLocalUsersFavorite(_ user : SearchUserInfo) {
         try! localFavoriteRealm.write {
-            let favoriteUesr = LocalSerchUserInfo(userId: self.users.value[index].userId)
-            favoriteUesr.userName = self.users.value[index].userName
-            favoriteUesr.profileImg = self.users.value[index].profileImg
-            
-            if !self.users.value[index].isFavorite {
-                localFavoriteRealm.add(favoriteUesr, update: .modified)
-                self.users.value[index].isFavorite = true
+            if let findUser = localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: user.userId) {
+                localFavoriteRealm.delete(localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: findUser.userId)!)
+                user.isFavorite = false
             }
             else {
-                localFavoriteRealm.delete(localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId)!)
-                self.users.value[index].isFavorite = false
+                let favoriteUesr = LocalSerchUserInfo(userId: user.userId)
+                favoriteUesr.userName = user.userName
+                favoriteUesr.profileImg = user.profileImg
+                user.isFavorite = true
+                localFavoriteRealm.add(favoriteUesr, update: .modified)
             }
+
+//            if !favoriteUesr.isFavorite {
+//                localFavoriteRealm.add(favoriteUesr, update: .modified)
+//                self.users.value[index].isFavorite = true
+//            }
+//            else {
+//                localFavoriteRealm.delete(localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId)!)
+//                self.users.value[index].isFavorite = false
+//            }
         }
     }
     
-    func deleteLocalUserFavorite(_ index: Int) {
+    func deleteLocalUserFavorite(_ userID: Int64, completion: @escaping () -> Void ) {
         try! localFavoriteRealm.write {
-            let favoriteUesr = LocalSerchUserInfo(userId: self.favoriteUsers.value[index].userId)
-            if localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId) != nil {
-                localFavoriteRealm.delete(localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId)!)
-                getLocalUsers()
+            if let favoriteUesr = localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: userID) {
+                print("favoriteUesr delete \(favoriteUesr.userName)")
+                if localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId) != nil {
+                    localFavoriteRealm.delete(localFavoriteRealm.object(ofType: LocalSerchUserInfo.self, forPrimaryKey: favoriteUesr.userId)!)
+                    getLocalUsers()
+                    completion()
+                }
             }
-            
         }
     }
 }
